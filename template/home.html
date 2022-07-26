@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Harbor template</title>
+        <!-- css연동(CDN) -->
+	    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	    <!-- css연동(직접) -->
+	    <link href="static/css/bootstrap.css" rel="stylesheet">
+	    <link href="static/css/style.css" rel="stylesheet">
+	    <!-- favicon -->
+	    <link rel="shortcut icon" href="static/image/favicon.ico" type="image/x-icon">
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+        <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    </head>
+    <body>
+        <!-- css연동(CDN) -->
+	    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" 
+	    crossorigin="anonymous"></script>
+	    <!-- css연동(직접) -->
+	    <script src="assets/js/bootstrap.js"></script>
+	    <script src="assets/js/main.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+        <!-- Responsive navbar-->
+        <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+            <div class="container px-5">
+                <a class="navbar-brand" href="#!">beHarbor</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#!">Community</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#!">9-bon blog~</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#!">Services</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <script>
+            // 변경된 사항 : 일단 슬라이드 안에 사진, 영상을 합쳐서 넣어봤음.
+            // 그리고 슬라이드에서 시간이 지나면 자동으로 넘어감(영상 재생 중 영상이 끝나지도 않았는데 자동으로 넘어감)
+            // 현재 interval을 false로 줘서 기능을 제거해서 영상이 끝나기 전에 넘어가지 않게 해놨음.
+            // 근데 이게 사진도 안넘어가서 문제 + 영상이 끝나도 안넘어감
+            // 그래서 첫 화면이 사진일 때 자기가 ">" 이 버튼을 눌르지 않는 이상 뒤에 영상이 있는지 없는지를 모름
+            // 그리고 영상이 끝나면 자기가 넘겨야댐. 근데 애들이 넘길까 싶긴함..  ㅎㅎ..
+
+            const videos = []
+            const tag = document.createElement("script")
+            const firstScriptTag = document.getElementsByTagName("script")[0]
+            tag.src = "https://www.youtube.com/iframe_api"
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+            function onYouTubeIframeAPIReady() {
+              const slides = Array.from(document.querySelectorAll(".carousel-item"))
+              slides.forEach((slide, index) => {
+                const video = slide.querySelector(".video-player")
+                if (video && video.dataset) {
+                  const player = createPlayer({
+                    id: video.id,
+                    videoId: video.dataset.videoId,
+                  })
+                  videos.push({ player, index })
+                }
+              })
+            }
+            //$(".carousel").carousel({ interval:10000}); // 이걸 넣어서 슬라이드 시간 조절을 하는데 뭐지 ,,? 먹지를 않음,,
+            function createPlayer(playerInfo) {
+              return new YT.Player(playerInfo.id, {
+                videoId: playerInfo.videoId,
+                playerVars: {
+                  showinfo: 0,
+                },
+                events: {
+                  'onStateChange': onPlayerStateChange
+                  }
+              })
+            }
+            function onPlayerStateChange(event) {
+                if(event.data === 0) $('.carousel').carousel();
+                else $('.carousel').carousel('pause');
+                }
+            function theBigPause() {
+              videos.map(video => video.player.pauseVideo())
+            }
+            $(function () {
+              $(".carousel").on("slide.bs.carousel", function (e) {
+                theBigPause()
+                const next = $(e.relatedTarget).index()
+                const video = videos.filter(v => v.index === next)[0]
+                if (video) {
+                  video.player.playVideo();
+                }
+              })
+            })
+        </script>
+        <div class="container contenedor-slide">
+            <div class="row">
+                <div class="col-xs-12 col-md-8">
+                    <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" data-interval="false">
+                        <!-- 슬라이드 시간 조절. 이 부분을 false로 줌-->
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <!-- 이미지 일때 -->
+                                <img class="d-block w-100" src="{{ url_for('static', filename = 'image/karina.jpg') }}"
+                                    alt="First slide" />
+                            </div>
+                            <div class="carousel-item">
+                                <!-- 영상 일때 -->
+                                <div class="carousel-video-inner embed-responsive embed-responsive-16by9">
+                                    <div class="video-player" id="player1" data-video-id="u_nc-t4oHfw"></div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <!-- 영상 일때 -->
+                                <div class="carousel-video-inner embed-responsive embed-responsive-16by9">
+                                    <div class="video-player" id="player2" data-video-id="no_gfDbHTfE"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 버튼 문제 존재 이건 따로 말로 설명해야댐 글로 설명할 수가 없음.. -->
+                        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-4">
+                    <!-- 게시판 들어갈 부분-->
+                    <h3 class="font-weight-light">"Programming is a skill best acquired by practice and example rather than from books." </h1>
+                    <p align="right">Alan Mathison Turing(1912~1954)</p>                    
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Content-->
+        <!-- <div class="container px-4 px-lg-5"> -->
+            <!-- Heading Row-->
+            <!-- <div class="row gx-4 gx-lg-5 align-items-center my-5">
+                <div class="col-lg-7">
+                    <div id="carouselExampleFade" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                          </div>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+							    <img src="{{ url_for('static', filename = 'image/karina.jpg') }}" class="d-block w-100" alt="카리나.jpg">
+						    </div>
+						    <div class="carousel-item">
+							    <img src="{{ url_for('static', filename = 'image/winter.jpg') }}" class="d-block w-100" alt="윈터.jpg">
+						    </div>
+						    <div class="carousel-item">
+							    <img src="{{ url_for('static', filename = 'image/gigell.jpg') }}" class="d-block w-100" alt="지젤.jpg">
+						    </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                          </button>
+                          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                          </button>
+                    </div>
+                </div> -->
+                <!-- <div class="col-lg-7"><img class="img-fluid rounded mb-4 mb-lg-0" src="https://dummyimage.com/900x400/dee2e6/6c757d.jpg" alt="..." /></div> -->
+                <!-- <div class="col-lg-5">
+                    <h3 class="font-weight-light">"Programming is a skill best acquired by practice and example rather than from books." </h1>
+                    <p align="right">Alan Mathison Turing(1912~1954)</p> -->
+                    <!-- <a class="btn btn-primary" href="#!">진짜 연락하기!</a> -->
+                <!-- </div> -->
+                <!-- <div class="row">
+                    <div id="player"></div> -->
+                    <!-- <a class="btn btn-primary" href="#!">진짜 연락하기!</a> -->
+                <!-- </div>
+            </div> -->
+            <!-- Call to Action-->
+            <!-- <div class="card text-white bg-light my-5 py-4 text-center">
+                <div class="card-body"><p class="text-black m-0">와,, 진짜</p></div>
+            </div> -->
+            <!-- Content Row-->
+            <div class="container">
+                <div class="row gx-4 gx-lg-5">
+                    <div class="col-md-4 mb-5">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h2 class="card-title">IDE-Service</h2>
+                                <p class="card-text">모든 책임은 본인에게 있습니다.</p>
+                            </div>
+                            <div class="card-footer"><a class="btn btn-outline-primary" href="{{url_for('ide')}}">Let's go!</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-5">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h2 class="card-title">File Upload</h2>
+                                <p class="card-text">모든 책임은 본인에게 있습니다.</p>
+                            </div>
+                            <div class="card-footer"><a class="btn btn-outline-primary" href="{{url_for('file_setting')}}">Let's
+                                    go!</a></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-5">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h2 class="card-title">Logout</h2>
+                                <p class="card-text">모든 책임은 본인에게 있습니다.</p>
+                            </div>
+                            <div class="card-footer "><a class="btn btn-outline-primary" href="{{url_for('logout')}}">Let's go!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       <!-- ############## Footer Start ################-->
+	    <footer>
+		    <div class="card text-center">
+			    <div class="card-body" style="background-color: #e3f2fd;">
+			    <p class="card-text mt-3">Made by Beharbor</p>
+			    <p class="card-text">Copyright &copy; <script>document.write(new Date().getFullYear());</script> All right reserved.</p>
+			    </div>
+		    </div>
+	    </footer>
+	    <!-- ############## Footer End ################-->
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+    </body>
+</html>

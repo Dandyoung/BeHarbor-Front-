@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+const videos = []
+const tag = document.createElement("script")
+const firstScriptTag = document.getElementsByTagName("script")[0]
+tag.src = "https://www.youtube.com/iframe_api"
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+function onYouTubeIframeAPIReady() {
+  const slides = Array.from(document.querySelectorAll(".carousel-item"))
+  slides.forEach((slide, index) => {
+    const video = slide.querySelector(".video-player")
+    if (video && video.dataset) {
+      const player = createPlayer({
+        id: video.id,
+        videoId: video.dataset.videoId,
+      })
+      videos.push({ player, index })
+    }
+  })
+}
+function createPlayer(playerInfo) {
+  return new YT.Player(playerInfo.id, {
+    videoId: playerInfo.videoId,
+    playerVars: {
+      showinfo: 0,
+    },
+    events: {
+      'onStateChange': onPlayerStateChange
+      }
+  })
+}
+function onPlayerStateChange(event) {
+    if(event.data === 0) $('.carousel').carousel();
+    else $('.carousel').carousel('pause');
+    }
+function theBigPause() {
+  videos.map(video => video.player.pauseVideo())
+}
+$(function () {
+  $(".carousel").on("slide.bs.carousel", function (e) {
+    theBigPause()
+    const next = $(e.relatedTarget).index()
+    const video = videos.filter(v => v.index === next)[0]
+    if (video) {
+      video.player.playVideo();
+    }
+  })
+})
+</script>
+<style>
+.contenedor-slide{height: auto;width: 100%;padding-top: 10px;margin-top: 10px;padding-bottom: 5px;margin-bottom: 10px;}
+.carousel-control-prev-icon, .carousel-control-next-icon {height: 100px;width: 100px;outline: black;}
+</style>
+    <div class="container contenedor-slide">
+      <div id="carouselExampleControls"class="carousel slide"data-ride="carousel"data-interval="3000">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img class="d-block w-100" src="C:/Users/이영우/Desktop/Code/CodeServerThird/static/image/gigell.jpg" alt="First slide" />
+          </div>
+          <div class="carousel-item">
+            <div class="carousel-video-inner embed-responsive embed-responsive-16by9">
+              <div class="video-player" id="player1" data-video-id="u_nc-t4oHfw" ></div>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <div class="carousel-video-inner embed-responsive embed-responsive-16by9" >
+              <div class="video-player" id="player2" data-video-id="u_nc-t4oHfw" ></div>
+            </div>
+          </div>
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev" >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next" >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+    </div>
+    
+</body>
+</html>
